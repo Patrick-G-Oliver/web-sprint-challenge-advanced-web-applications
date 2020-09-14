@@ -10,6 +10,7 @@ const ColorList = ({ colors, updateColors, getColors }) => {
   // console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [newColor, setNewColor] = useState(initialColor);
 
   const editColor = color => {
     setEditing(true);
@@ -34,6 +35,17 @@ const ColorList = ({ colors, updateColors, getColors }) => {
     // make a delete request to delete this color
     axiosWithAuth()
       .delete(`http://localhost:5000/api/colors/${color.id}`)
+      .then( (res) => {
+        console.log(res.data)
+        getColors();
+      })
+  };
+
+  const addColor = e => {
+    e.preventDefault();
+    // post request made to add a color
+    axiosWithAuth()
+      .post("http://localhost:5000/api/colors/", newColor)
       .then( (res) => {
         console.log(res.data)
         getColors();
@@ -93,8 +105,39 @@ const ColorList = ({ colors, updateColors, getColors }) => {
           </div>
         </form>
       )}
-      <div className="spacer" />
+      {/*<div className="spacer" />*/}
       {/* stretch - build another form here to add a color */}
+      <div>
+        <form onSubmit={addColor}>
+          <h3>Add a color!</h3>
+          <input
+            type="text"
+            name="color"
+            value={newColor.color}
+            placeholder="color name"
+            onChange={e => {
+              setNewColor({
+                ...newColor,
+                color: e.target.value
+              })
+            }}
+          />
+          <input
+            type="text"
+            placeholder="hex code"
+              onChange={e =>
+                setNewColor({
+                  ...newColor,
+                  code: { hex: e.target.value }
+                })
+              }
+              value={newColor.code.hex}
+            />
+          <div className="button-row">
+            <button type="submit">Add</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
